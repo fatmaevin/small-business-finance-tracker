@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import API from "../api/api";
+import Navbar from "../components/Navbar";
+import TransactionFilters from "../components/TransactionFilters";
+import TransactionTable from "../components/TransactionTable";
 
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -34,7 +37,6 @@ function Transactions() {
       .includes(search.toLowerCase());
 
     const transactionDate = transaction.transaction_date?.split("T")[0];
-
     const matchesDate = dateFilter === "" || transactionDate === dateFilter;
 
     return matchesSearch && matchesDate;
@@ -90,84 +92,33 @@ function Transactions() {
 
   return (
     <div>
+      <Navbar />
+
       <h1>Transactions</h1>
 
-      <input
-        placeholder="Search by description..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+      <TransactionFilters
+        search={search}
+        setSearch={setSearch}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
       />
 
-      <input
-        type="date"
-        value={dateFilter}
-        onChange={(e) => setDateFilter(e.target.value)}
+      <TransactionTable
+        transactions={filteredTransactions}
+        editingId={editingId}
+        editAmount={editAmount}
+        setEditAmount={setEditAmount}
+        editDescription={editDescription}
+        setEditDescription={setEditDescription}
+        editType={editType}
+        setEditType={setEditType}
+        editTransactionDate={editTransactionDate}
+        setEditTransactionDate={setEditTransactionDate}
+        startEdit={startEdit}
+        cancelEdit={cancelEdit}
+        handleUpdate={handleUpdate}
+        handleDelete={handleDelete}
       />
-
-      <button onClick={() => setDateFilter("")}>Clear Date</button>
-
-      {filteredTransactions.length === 0 ? (
-        <p>No matching transactions found.</p>
-      ) : (
-        <ul>
-          {filteredTransactions.map((transaction) => (
-            <li key={transaction.id}>
-              {editingId === transaction.id ? (
-                <div>
-                  <input
-                    type="number"
-                    value={editAmount}
-                    onChange={(e) => setEditAmount(e.target.value)}
-                  />
-
-                  <input
-                    value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                  />
-
-                  <select
-                    value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
-                  >
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                  </select>
-
-                  <input
-                    type="date"
-                    value={editTransactionDate}
-                    onChange={(e) => setEditTransactionDate(e.target.value)}
-                  />
-
-                  <button onClick={() => handleUpdate(transaction.id)}>
-                    Save
-                  </button>
-
-                  <button onClick={cancelEdit}>Cancel</button>
-                </div>
-              ) : (
-                <div>
-                  <p>
-                    Date:{" "}
-                    {new Date(transaction.transaction_date).toLocaleDateString(
-                      "en-GB"
-                    )}
-                  </p>
-
-                  <strong>{transaction.type}</strong> -{" "}
-                  {transaction.description} - £{transaction.amount}
-
-                  <button onClick={() => startEdit(transaction)}>Edit</button>
-
-                  <button onClick={() => handleDelete(transaction.id)}>
-                    Delete
-                  </button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }
