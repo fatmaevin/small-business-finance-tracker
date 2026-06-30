@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import API from "../api/api";
 
 function Login() {
@@ -12,44 +13,83 @@ function Login() {
         password,
       });
 
-      console.log("LOGIN RESPONSE:", res.data);
-
       if (!res.data.access_token) {
-        alert("Login failed: Token gelmedi.");
+        alert("Login failed.");
         return;
       }
 
       localStorage.setItem("token", res.data.access_token);
 
-      console.log("SAVED TOKEN:", localStorage.getItem("token"));
-
-      alert("Login successful");
       window.location.href = "/dashboard";
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Login failed");
+      alert("Login failed.");
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
 
-      <input
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Business Finance Tracker
+          </h1>
 
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <p className="text-gray-500 mt-2">
+            Welcome back! Please sign in.
+          </p>
+        </div>
 
-      <button onClick={handleLogin}>Login</button>
+        <div className="space-y-5">
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition"
+          >
+            Login
+          </button>
+        </div>
+
+        <p className="text-center text-sm text-gray-500 mt-8">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Register
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
