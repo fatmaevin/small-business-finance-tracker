@@ -22,3 +22,9 @@ class TransactionCreate(BaseModel):
     amount: int
     description: str
     type: str
+
+
+class TransactionUpdate(BaseModel):
+    amount: int
+    description: str
+    type: str

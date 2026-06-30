@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.schemas import TransactionCreate
+from app.schemas import TransactionUpdate
 
 from app.database import SessionLocal
 from app.models import Transaction, User
@@ -133,3 +134,35 @@ def delete_transaction(
     db.commit()
 
     return {"message": "Transaction deleted successfully"}
+
+
+@router.put("/transactions/{transaction_id}")
+def update_transaction(
+    transaction_id: int,
+    updated_transaction: TransactionUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    transaction = (
+        db.query(Transaction)
+        .filter(
+            Transaction.id == transaction_id,
+            Transaction.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    transaction.amount = updated_transaction.amount
+    transaction.description = updated_transaction.description
+    transaction.type = updated_transaction.type
+
+    db.commit()
+    db.refresh(transaction)
+
+    return {
+        "message": "Transaction updated successfully",
+        "transaction": transaction,
+    }
