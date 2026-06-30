@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../api/api";
+import toast from "react-hot-toast";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ function Login() {
       });
 
       if (!res.data.access_token) {
-        alert("Login failed.");
+        toast.error("Login failed.");
         return;
       }
 
@@ -24,7 +25,7 @@ function Login() {
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Login failed.");
+      toast.error("Login failed.");
     }
   };
 

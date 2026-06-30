@@ -3,6 +3,7 @@ import API from "../api/api";
 import Navbar from "../components/Navbar";
 import SummaryCards from "../components/SummaryCards";
 import TransactionForm from "../components/TransactionForm";
+import toast from "react-hot-toast";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -31,7 +32,7 @@ function Dashboard() {
         const res = await API.get("/me");
         setUser(res.data);
       } catch (err) {
-        alert("Session expired. Please login again.");
+        toast.error("Session expired. Please login again.");
         localStorage.removeItem("token");
         window.location.href = "/login";
       }
@@ -44,7 +45,7 @@ function Dashboard() {
   const handleTransaction = async () => {
     try {
       if (!amount || !type || !transactionDate) {
-        alert("Please enter amount, type and date.");
+        toast.error("Please enter amount, type and date.");
         return;
       }
 
@@ -55,7 +56,7 @@ function Dashboard() {
         transaction_date: transactionDate,
       });
 
-      alert("Transaction added successfully");
+      toast.success("Transaction added successfully");
 
       setAmount("");
       setDescription("");
@@ -66,7 +67,7 @@ function Dashboard() {
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Data is not saved");
+      toast.error("Data is not saved");
     }
   };
 
