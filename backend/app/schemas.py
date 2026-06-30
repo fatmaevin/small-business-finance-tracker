@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class RegisterUser(BaseModel):
     name:str
@@ -22,9 +23,11 @@ class TransactionCreate(BaseModel):
     amount: int
     description: str
     type: str
+    transaction_date: datetime
 
 
 class TransactionUpdate(BaseModel):
     amount: int
     description: str
     type: str
+    transaction_date: datetime
