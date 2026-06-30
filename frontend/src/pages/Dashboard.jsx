@@ -1,37 +1,14 @@
 import { useEffect, useState } from "react";
-import API from "../api/api";
 import { Link } from "react-router-dom";
+import API from "../api/api";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
+  const [summary, setSummary] = useState(null);
+
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
-
-  const handleTransaction = async () => {
-    try {
-      if (!amount || !type) {
-        alert("Please enter amount and select type.");
-        return;
-      }
-  
-      await API.post("/transactions", {
-        amount: Number(amount),
-        description,
-        type,
-      });
-  
-      alert("Transaction added successfully");
-  
-      setAmount("");
-      setDescription("");
-      setType("");
-    } catch (err) {
-      console.log(err.response?.data);
-      console.log(err.message);
-      alert("Data is not saved");
-    }
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,8 +22,47 @@ function Dashboard() {
       }
     };
 
+    const fetchDashboard = async () => {
+      try {
+        const res = await API.get("/dashboard");
+        setSummary(res.data);
+      } catch (err) {
+        console.log(err.response?.data);
+        console.log(err.message);
+      }
+    };
+
     fetchUser();
+    fetchDashboard();
   }, []);
+
+  const handleTransaction = async () => {
+    try {
+      if (!amount || !type) {
+        alert("Please enter amount and select type.");
+        return;
+      }
+
+      await API.post("/transactions", {
+        amount: Number(amount),
+        description,
+        type,
+      });
+
+      alert("Transaction added successfully");
+
+      setAmount("");
+      setDescription("");
+      setType("");
+
+      const res = await API.get("/dashboard");
+      setSummary(res.data);
+    } catch (err) {
+      console.log(err.response?.data);
+      console.log(err.message);
+      alert("Data is not saved");
+    }
+  };
 
   if (!user) {
     return <p>Loading...</p>;
@@ -65,9 +81,16 @@ function Dashboard() {
       >
         Logout
       </button>
-      <p>
-      <Link to="/transactions">View All Transactions</Link>
-      </p>
+
+      {summary && (
+        <div>
+          <h2>Summary</h2>
+          <p>Total Income: £{summary.total_income}</p>
+          <p>Total Expense: £{summary.total_expense}</p>
+          <p>Balance: £{summary.balance}</p>
+          <p>Transactions: {summary.transaction_count}</p>
+        </div>
+      )}
 
       <h2>Add Transaction</h2>
 
@@ -91,6 +114,10 @@ function Dashboard() {
       </select>
 
       <button onClick={handleTransaction}>Add Transaction</button>
+
+      <p>
+        <Link to="/transactions">View All Transactions</Link>
+      </p>
     </div>
   );
 }
