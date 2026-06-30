@@ -75,25 +75,33 @@ function Dashboard() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-
-      <h1>Welcome, {user.name}</h1>
-      <p>Email: {user.email}</p>
-
-      <SummaryCards summary={summary} />
-
-      <TransactionForm
-        amount={amount}
-        setAmount={setAmount}
-        description={description}
-        setDescription={setDescription}
-        type={type}
-        setType={setType}
-        transactionDate={transactionDate}
-        setTransactionDate={setTransactionDate}
-        handleTransaction={handleTransaction}
-      />
+  
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome, {user.name}
+          </h1>
+          <p className="text-gray-500 mt-1">{user.email}</p>
+        </div>
+  
+        <SummaryCards summary={summary} />
+  
+        <div className="mt-8">
+          <TransactionForm
+            amount={amount}
+            setAmount={setAmount}
+            description={description}
+            setDescription={setDescription}
+            type={type}
+            setType={setType}
+            transactionDate={transactionDate}
+            setTransactionDate={setTransactionDate}
+            handleTransaction={handleTransaction}
+          />
+        </div>
+      </main>
     </div>
   );
 }

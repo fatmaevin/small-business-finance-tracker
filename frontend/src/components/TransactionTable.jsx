@@ -15,64 +15,161 @@ function TransactionTable({
     handleDelete,
   }) {
     if (transactions.length === 0) {
-      return <p>No matching transactions found.</p>;
+      return (
+        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
+          No matching transactions found.
+        </div>
+      );
     }
   
     return (
-      <ul>
-        {transactions.map((transaction) => (
-          <li key={transaction.id}>
-            {editingId === transaction.id ? (
-              <div>
-                <input
-                  type="number"
-                  value={editAmount}
-                  onChange={(e) => setEditAmount(e.target.value)}
-                />
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-3 text-sm font-semibold text-gray-600">
+                  Date
+                </th>
+                <th className="px-4 py-3 text-sm font-semibold text-gray-600">
+                  Description
+                </th>
+                <th className="px-4 py-3 text-sm font-semibold text-gray-600">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-sm font-semibold text-gray-600">
+                  Amount
+                </th>
+                <th className="px-4 py-3 text-sm font-semibold text-gray-600">
+                  Actions
+                </th>
+              </tr>
+            </thead>
   
-                <input
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                />
+            <tbody>
+              {transactions.map((transaction) => {
+                const isIncome = transaction.type === "income";
   
-                <select
-                  value={editType}
-                  onChange={(e) => setEditType(e.target.value)}
-                >
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>
-                </select>
+                return (
+                  <tr
+                    key={transaction.id}
+                    className="border-b border-gray-100 last:border-b-0"
+                  >
+                    {editingId === transaction.id ? (
+                      <>
+                        <td className="px-4 py-3">
+                          <input
+                            type="date"
+                            value={editTransactionDate}
+                            onChange={(e) =>
+                              setEditTransactionDate(e.target.value)
+                            }
+                            className="border border-gray-300 rounded-lg px-3 py-2"
+                          />
+                        </td>
   
-                <input
-                  type="date"
-                  value={editTransactionDate}
-                  onChange={(e) => setEditTransactionDate(e.target.value)}
-                />
+                        <td className="px-4 py-3">
+                          <input
+                            value={editDescription}
+                            onChange={(e) =>
+                              setEditDescription(e.target.value)
+                            }
+                            className="border border-gray-300 rounded-lg px-3 py-2"
+                          />
+                        </td>
   
-                <button onClick={() => handleUpdate(transaction.id)}>Save</button>
-                <button onClick={cancelEdit}>Cancel</button>
-              </div>
-            ) : (
-              <div>
-                <p>
-                  Date:{" "}
-                  {new Date(transaction.transaction_date).toLocaleDateString(
-                    "en-GB"
-                  )}
-                </p>
+                        <td className="px-4 py-3">
+                          <select
+                            value={editType}
+                            onChange={(e) => setEditType(e.target.value)}
+                            className="border border-gray-300 rounded-lg px-3 py-2"
+                          >
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                          </select>
+                        </td>
   
-                <strong>{transaction.type}</strong> - {transaction.description} -
-                £{transaction.amount}
+                        <td className="px-4 py-3">
+                          <input
+                            type="number"
+                            value={editAmount}
+                            onChange={(e) => setEditAmount(e.target.value)}
+                            className="border border-gray-300 rounded-lg px-3 py-2"
+                          />
+                        </td>
   
-                <button onClick={() => startEdit(transaction)}>Edit</button>
-                <button onClick={() => handleDelete(transaction.id)}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+                        <td className="px-4 py-3 space-x-2">
+                          <button
+                            onClick={() => handleUpdate(transaction.id)}
+                            className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700"
+                          >
+                            Save
+                          </button>
+  
+                          <button
+                            onClick={cancelEdit}
+                            className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200"
+                          >
+                            Cancel
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {new Date(
+                            transaction.transaction_date
+                          ).toLocaleDateString("en-GB")}
+                        </td>
+  
+                        <td className="px-4 py-3 font-medium text-gray-900">
+                          {transaction.description}
+                        </td>
+  
+                        <td className="px-4 py-3">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              isIncome
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {transaction.type}
+                          </span>
+                        </td>
+  
+                        <td
+                          className={`px-4 py-3 font-semibold ${
+                            isIncome ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {isIncome ? "+" : "-"}£{transaction.amount}
+                        </td>
+  
+                        <td className="px-4 py-3 space-x-2">
+                          <button
+                            onClick={() => startEdit(transaction)}
+                            className="bg-blue-50 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-100"
+                          >
+                            Edit
+                          </button>
+  
+                          <button
+                            onClick={() => handleDelete(transaction.id)}
+                            className="bg-red-50 text-red-700 px-3 py-2 rounded-lg hover:bg-red-100"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     );
   }
   
