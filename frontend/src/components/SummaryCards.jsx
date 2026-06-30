@@ -1,24 +1,42 @@
+import { formatCurrency } from "../utils/formatCurrency";
+
 function SummaryCards({ summary }) {
   if (!summary) {
     return <p className="text-gray-500">Loading summary...</p>;
   }
 
+  const isPositiveBalance = summary.balance >= 0;
+
   const cards = [
     {
       title: "Total Income",
-      value: `£${summary.total_income}`,
+      value: formatCurrency(summary.total_income),
+      icon: "💰",
+      className: "bg-green-50 border-green-200",
+      textClass: "text-green-700",
     },
     {
       title: "Total Expense",
-      value: `£${summary.total_expense}`,
+      value: formatCurrency(summary.total_expense),
+      icon: "💸",
+      className: "bg-red-50 border-red-200",
+      textClass: "text-red-700",
     },
     {
       title: "Balance",
-      value: `£${summary.balance}`,
+      value: formatCurrency(summary.balance),
+      icon: "📈",
+      className: isPositiveBalance
+        ? "bg-blue-50 border-blue-200"
+        : "bg-red-50 border-red-200",
+      textClass: isPositiveBalance ? "text-blue-700" : "text-red-700",
     },
     {
       title: "Transactions",
       value: summary.transaction_count,
+      icon: "🧾",
+      className: "bg-purple-50 border-purple-200",
+      textClass: "text-purple-700",
     },
   ];
 
@@ -27,10 +45,14 @@ function SummaryCards({ summary }) {
       {cards.map((card) => (
         <div
           key={card.title}
-          className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm"
+          className={`${card.className} border rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300`}
         >
-          <p className="text-sm text-gray-500">{card.title}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-gray-600">{card.title}</p>
+            <span className="text-2xl">{card.icon}</span>
+          </div>
+
+          <p className={`text-2xl font-bold mt-3 ${card.textClass}`}>
             {card.value}
           </p>
         </div>
