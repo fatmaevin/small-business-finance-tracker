@@ -1,3 +1,5 @@
+import { formatCurrency } from "../utils/formatCurrency";
+
 function TransactionTable({
     transactions,
     editingId,
@@ -143,7 +145,8 @@ function TransactionTable({
                             isIncome ? "text-green-600" : "text-red-600"
                           }`}
                         >
-                          {isIncome ? "+" : "-"}£{transaction.amount}
+                          {isIncome ? "+" : "-"}
+                          {formatCurrency(transaction.amount)}
                         </td>
   
                         <td className="px-4 py-3 space-x-2">
