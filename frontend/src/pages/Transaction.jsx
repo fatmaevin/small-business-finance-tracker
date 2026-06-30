@@ -9,6 +9,8 @@ function Transactions() {
   const [editDescription, setEditDescription] = useState("");
   const [editType, setEditType] = useState("");
 
+  const [search, setSearch] = useState("");
+
   const fetchTransactions = async () => {
     try {
       const res = await API.get("/transactions");
@@ -23,6 +25,12 @@ function Transactions() {
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  const filteredTransactions = transactions.filter((transaction) =>
+    transaction.description
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
   const startEdit = (transaction) => {
     setEditingId(transaction.id);
@@ -73,11 +81,17 @@ function Transactions() {
     <div>
       <h1>Transactions</h1>
 
-      {transactions.length === 0 ? (
-        <p>No transactions yet.</p>
+      <input
+        placeholder="Search by description..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      {filteredTransactions.length === 0 ? (
+        <p>No matching transactions found.</p>
       ) : (
         <ul>
-          {transactions.map((transaction) => (
+          {filteredTransactions.map((transaction) => (
             <li key={transaction.id}>
               {editingId === transaction.id ? (
                 <div>
