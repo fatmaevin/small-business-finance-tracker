@@ -18,9 +18,17 @@ function TransactionTable({
   }) {
     if (transactions.length === 0) {
       return (
-        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
-          No matching transactions found.
-        </div>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-10 text-center">
+        <p className="text-5xl mb-4">📄</p>
+
+        <h2 className="text-xl font-semibold text-gray-800">
+            No transactions found
+        </h2>
+
+  <p className="text-gray-500 mt-2">
+    Try changing your filters or add a new transaction.
+  </p>
+</div>
       );
     }
   

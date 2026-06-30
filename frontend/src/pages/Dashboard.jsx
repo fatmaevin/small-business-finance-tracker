@@ -43,36 +43,50 @@ function Dashboard() {
   }, []);
 
   const handleTransaction = async () => {
+    const trimmedDescription = description.trim();
+  
+    if (!amount || !trimmedDescription || !type || !transactionDate) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+  
+    if (Number(amount) <= 0) {
+      toast.error("Amount must be greater than 0.");
+      return;
+    }
+  
     try {
-      if (!amount || !type || !transactionDate) {
-        toast.error("Please enter amount, type and date.");
-        return;
-      }
-
       await API.post("/transactions", {
         amount: Number(amount),
-        description,
+        description: trimmedDescription,
         type,
         transaction_date: transactionDate,
       });
-
-      toast.success("Transaction added successfully");
-
+  
+      toast.success("Transaction added successfully.");
+  
       setAmount("");
       setDescription("");
       setType("");
       setTransactionDate(new Date().toISOString().split("T")[0]);
-
+  
       fetchDashboard();
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      toast.error("Data is not saved");
+  
+      toast.error("Transaction could not be added.");
     }
   };
 
   if (!user) {
-    return <p>Loading...</p>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-8 py-6">
+          <p className="text-gray-500 text-lg">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -81,7 +95,7 @@ function Dashboard() {
   
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Welcome, {user.name}
           </h1>
           <p className="text-gray-500 mt-1">{user.email}</p>
