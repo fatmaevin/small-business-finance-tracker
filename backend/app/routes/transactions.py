@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from app.schemas import TransactionCreate
 
 from app.database import SessionLocal
 from app.models import Transaction, User
 from app.routes.auth import get_current_user
+from fastapi import HTTPException
 
 
 router = APIRouter()
@@ -24,17 +26,18 @@ def get_db():
 # -----------------------
 # CREATE TRANSACTION
 # -----------------------
+
 @router.post("/transactions")
 def create_transaction(
-    amount: int,
-    description: str,
-    type: str,  # income / expense
+    transaction: TransactionCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-
     new_txn = Transaction(
-        amount=amount, description=description, type=type, user_id=current_user.id
+        amount=transaction.amount,
+        description=transaction.description,
+        type=transaction.type,
+        user_id=current_user.id,
     )
 
     db.add(new_txn)
@@ -46,6 +49,7 @@ def create_transaction(
         "transaction": {
             "id": new_txn.id,
             "amount": new_txn.amount,
+            "description": new_txn.description,
             "type": new_txn.type,
         },
     }
@@ -102,3 +106,30 @@ def get_dashboard(
         "balance": balance,
         "transaction_count": len(income_transactions) + len(expense_transactions),
     }
+# -----------------------
+# DELETE TRANSACTIONS
+# -----------------------
+
+
+@router.delete("/transactions/{transaction_id}")
+def delete_transaction(
+    transaction_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    transaction = (
+        db.query(Transaction)
+        .filter(
+            Transaction.id == transaction_id,
+            Transaction.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    db.delete(transaction)
+    db.commit()
+
+    return {"message": "Transaction deleted successfully"}

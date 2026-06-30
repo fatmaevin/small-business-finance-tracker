@@ -16,3 +16,9 @@ class UserResponse(BaseModel):
     email:str
     class Config:
         from_attributes=True    
+
+
+class TransactionCreate(BaseModel):
+    amount: int
+    description: str
+    type: str
