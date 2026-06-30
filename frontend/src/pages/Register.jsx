@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../api/api";
+import toast from "react-hot-toast";
 
 function Register() {
   const [name, setName] = useState("");
@@ -15,12 +16,12 @@ function Register() {
         password,
       });
 
-      alert("Registration successful.");
+      toast.success("Registration successful.");
       window.location.href = "/login";
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Registration failed.");
+      toast.error("Registration failed.");
     }
   };
 

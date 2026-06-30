@@ -3,6 +3,7 @@ import API from "../api/api";
 import Navbar from "../components/Navbar";
 import TransactionFilters from "../components/TransactionFilters";
 import TransactionTable from "../components/TransactionTable";
+import toast from "react-hot-toast";
 
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -23,7 +24,7 @@ function Transactions() {
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Transactions could not be loaded.");
+      toast.err("Transactions could not be loaded.");
     }
   };
 
@@ -67,26 +68,26 @@ function Transactions() {
         transaction_date: editTransactionDate,
       });
 
-      alert("Transaction updated successfully");
+      toast.success("Transaction updated successfully");
 
       cancelEdit();
       fetchTransactions();
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Transaction could not be updated.");
+      toast.error("Transaction could not be updated.");
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await API.delete(`/transactions/${id}`);
-      alert("Transaction deleted successfully");
+      toast.success("Transaction deleted successfully");
       fetchTransactions();
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      alert("Transaction could not be deleted.");
+      toast.error("Transaction could not be deleted.");
     }
   };
 
