@@ -9,6 +9,9 @@ function Dashboard() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
+  const [transactionDate, setTransactionDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -38,8 +41,8 @@ function Dashboard() {
 
   const handleTransaction = async () => {
     try {
-      if (!amount || !type) {
-        alert("Please enter amount and select type.");
+      if (!amount || !type || !transactionDate) {
+        alert("Please enter amount, type and date.");
         return;
       }
 
@@ -47,6 +50,7 @@ function Dashboard() {
         amount: Number(amount),
         description,
         type,
+        transaction_date: transactionDate,
       });
 
       alert("Transaction added successfully");
@@ -54,6 +58,7 @@ function Dashboard() {
       setAmount("");
       setDescription("");
       setType("");
+      setTransactionDate(new Date().toISOString().split("T")[0]);
 
       const res = await API.get("/dashboard");
       setSummary(res.data);
@@ -112,6 +117,12 @@ function Dashboard() {
         <option value="income">Income</option>
         <option value="expense">Expense</option>
       </select>
+
+      <input
+        type="date"
+        value={transactionDate}
+        onChange={(e) => setTransactionDate(e.target.value)}
+      />
 
       <button onClick={handleTransaction}>Add Transaction</button>
 

@@ -8,8 +8,10 @@ function Transactions() {
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editType, setEditType] = useState("");
+  const [editTransactionDate, setEditTransactionDate] = useState("");
 
   const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
 
   const fetchTransactions = async () => {
     try {
@@ -26,17 +28,24 @@ function Transactions() {
     fetchTransactions();
   }, []);
 
-  const filteredTransactions = transactions.filter((transaction) =>
-    transaction.description
+  const filteredTransactions = transactions.filter((transaction) => {
+    const matchesSearch = transaction.description
       .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+      .includes(search.toLowerCase());
+
+    const transactionDate = transaction.transaction_date?.split("T")[0];
+
+    const matchesDate = dateFilter === "" || transactionDate === dateFilter;
+
+    return matchesSearch && matchesDate;
+  });
 
   const startEdit = (transaction) => {
     setEditingId(transaction.id);
     setEditAmount(transaction.amount);
     setEditDescription(transaction.description);
     setEditType(transaction.type);
+    setEditTransactionDate(transaction.transaction_date?.split("T")[0]);
   };
 
   const cancelEdit = () => {
@@ -44,6 +53,7 @@ function Transactions() {
     setEditAmount("");
     setEditDescription("");
     setEditType("");
+    setEditTransactionDate("");
   };
 
   const handleUpdate = async (id) => {
@@ -52,6 +62,7 @@ function Transactions() {
         amount: Number(editAmount),
         description: editDescription,
         type: editType,
+        transaction_date: editTransactionDate,
       });
 
       alert("Transaction updated successfully");
@@ -87,6 +98,14 @@ function Transactions() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
+      <input
+        type="date"
+        value={dateFilter}
+        onChange={(e) => setDateFilter(e.target.value)}
+      />
+
+      <button onClick={() => setDateFilter("")}>Clear Date</button>
+
       {filteredTransactions.length === 0 ? (
         <p>No matching transactions found.</p>
       ) : (
@@ -114,6 +133,12 @@ function Transactions() {
                     <option value="expense">Expense</option>
                   </select>
 
+                  <input
+                    type="date"
+                    value={editTransactionDate}
+                    onChange={(e) => setEditTransactionDate(e.target.value)}
+                  />
+
                   <button onClick={() => handleUpdate(transaction.id)}>
                     Save
                   </button>
@@ -122,6 +147,13 @@ function Transactions() {
                 </div>
               ) : (
                 <div>
+                  <p>
+                    Date:{" "}
+                    {new Date(transaction.transaction_date).toLocaleDateString(
+                      "en-GB"
+                    )}
+                  </p>
+
                   <strong>{transaction.type}</strong> -{" "}
                   {transaction.description} - £{transaction.amount}
 

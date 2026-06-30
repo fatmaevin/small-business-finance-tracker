@@ -38,6 +38,7 @@ def create_transaction(
         amount=transaction.amount,
         description=transaction.description,
         type=transaction.type,
+        transaction_date=transaction.transaction_date,
         user_id=current_user.id,
     )
 
@@ -52,6 +53,7 @@ def create_transaction(
             "amount": new_txn.amount,
             "description": new_txn.description,
             "type": new_txn.type,
+            "transaction_date": new_txn.transaction_date,
         },
     }
 
@@ -158,6 +160,7 @@ def update_transaction(
     transaction.amount = updated_transaction.amount
     transaction.description = updated_transaction.description
     transaction.type = updated_transaction.type
+    transaction.transaction_date = updated_transaction.transaction_date
 
     db.commit()
     db.refresh(transaction)

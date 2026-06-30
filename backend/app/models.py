@@ -15,5 +15,6 @@ class Transaction(Base):
     amount=Column(Integer)
     description=Column(String)
     type=Column(String ,nullable =False)
-    created_At=Column(DateTime, default=datetime.utcnow)
+    created_at=Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    transaction_date=Column(DateTime, nullable=False)
