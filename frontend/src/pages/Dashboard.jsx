@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api/api";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -64,6 +65,9 @@ function Dashboard() {
       >
         Logout
       </button>
+      <p>
+      <Link to="/transactions">View All Transactions</Link>
+      </p>
 
       <h2>Add Transaction</h2>
 
