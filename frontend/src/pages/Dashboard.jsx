@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import API from "../api/api";
+import Navbar from "../components/Navbar";
+import SummaryCards from "../components/SummaryCards";
+import TransactionForm from "../components/TransactionForm";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -13,6 +15,16 @@ function Dashboard() {
     new Date().toISOString().split("T")[0]
   );
 
+  const fetchDashboard = async () => {
+    try {
+      const res = await API.get("/dashboard");
+      setSummary(res.data);
+    } catch (err) {
+      console.log(err.response?.data);
+      console.log(err.message);
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -22,16 +34,6 @@ function Dashboard() {
         alert("Session expired. Please login again.");
         localStorage.removeItem("token");
         window.location.href = "/login";
-      }
-    };
-
-    const fetchDashboard = async () => {
-      try {
-        const res = await API.get("/dashboard");
-        setSummary(res.data);
-      } catch (err) {
-        console.log(err.response?.data);
-        console.log(err.message);
       }
     };
 
@@ -60,8 +62,7 @@ function Dashboard() {
       setType("");
       setTransactionDate(new Date().toISOString().split("T")[0]);
 
-      const res = await API.get("/dashboard");
-      setSummary(res.data);
+      fetchDashboard();
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
@@ -75,60 +76,24 @@ function Dashboard() {
 
   return (
     <div>
+      <Navbar />
+
       <h1>Welcome, {user.name}</h1>
       <p>Email: {user.email}</p>
 
-      <button
-        onClick={() => {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-        }}
-      >
-        Logout
-      </button>
+      <SummaryCards summary={summary} />
 
-      {summary && (
-        <div>
-          <h2>Summary</h2>
-          <p>Total Income: £{summary.total_income}</p>
-          <p>Total Expense: £{summary.total_expense}</p>
-          <p>Balance: £{summary.balance}</p>
-          <p>Transactions: {summary.transaction_count}</p>
-        </div>
-      )}
-
-      <h2>Add Transaction</h2>
-
-      <input
-        type="number"
-        placeholder="Amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+      <TransactionForm
+        amount={amount}
+        setAmount={setAmount}
+        description={description}
+        setDescription={setDescription}
+        type={type}
+        setType={setType}
+        transactionDate={transactionDate}
+        setTransactionDate={setTransactionDate}
+        handleTransaction={handleTransaction}
       />
-
-      <input
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      <select value={type} onChange={(e) => setType(e.target.value)}>
-        <option value="">Select type</option>
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-
-      <input
-        type="date"
-        value={transactionDate}
-        onChange={(e) => setTransactionDate(e.target.value)}
-      />
-
-      <button onClick={handleTransaction}>Add Transaction</button>
-
-      <p>
-        <Link to="/transactions">View All Transactions</Link>
-      </p>
     </div>
   );
 }
