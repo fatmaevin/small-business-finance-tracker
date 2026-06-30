@@ -2,7 +2,11 @@ import { formatCurrency } from "../utils/formatCurrency";
 
 function SummaryCards({ summary }) {
   if (!summary) {
-    return <p className="text-gray-500">Loading summary...</p>;
+    return (
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+        <p className="text-gray-500">Loading summary...</p>
+      </div>
+    );
   }
 
   const isPositiveBalance = summary.balance >= 0;
