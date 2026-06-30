@@ -1,25 +1,22 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas import RegisterUser, LoginUser
 
 from app.models import User
 from app.database import SessionLocal
 
+
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
+
+router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-# endpointleri gruplamak icin
-router = APIRouter()
-
-# her request icin db baglantisi acilir
-
-
+# DB
 def get_db():
     db = SessionLocal()
     try:
@@ -28,8 +25,7 @@ def get_db():
         db.close()
 
 
-# PASSWORD HASH
-
+# PASSWORD
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -41,8 +37,7 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-# jwt settings
-
+# JWT
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -58,27 +53,38 @@ def create_access_token(data: dict):
 # REGISTER
 @router.post("/register")
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
-    new_user = User(name=name, email=email, password=hash_password(password))
+    print(user.password)
+    print(type(user.password))
+    print(len(user.password))
+
+    new_user = User(
+        name=user.name, email=user.email, password=hash_password(user.password)
+    )
+
     db.add(new_user)
     db.commit()
+
     return {"message": "User created successfully"}
 
 
 # LOGIN
 @router.post("/login")
 def login_user(user: LoginUser, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        return {"error": "Invalid credentials"}
 
-    if not verify_password(password, user.password):
-        return {"error": "Invalid credentials"}
+    db_user = db.query(User).filter(User.email == user.email).first()
 
-    token = create_access_token({"user_id": user.id})
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    token = create_access_token({"user_id": db_user.id})
 
     return {"access_token": token, "token_type": "bearer"}
 
 
+# CURRENT USER
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
@@ -86,7 +92,7 @@ def get_current_user(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
 
-        if user_id is None:
+        if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token")
 
     except JWTError:
@@ -94,12 +100,13 @@ def get_current_user(
 
     user = db.query(User).filter(User.id == user_id).first()
 
-    if user is None:
+    if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
 
 
+# ME
 @router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
     return {
