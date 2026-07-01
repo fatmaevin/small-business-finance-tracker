@@ -1,10 +1,13 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:8000",
+  baseURL:
+    process.env.NODE_ENV === "production"
+      ? "https://dailybooks-api.onrender.com"
+      : "http://127.0.0.1:8000",
 });
 
-// her request'e token ekle
+// Her request'e token ekle
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
