@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Transaction from "./pages/Transaction";
 import Reports from "./pages/Reports";
+import VerifyEmail from "./pages/VerifyEmail";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -18,6 +19,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         <Route
           path="/dashboard"
