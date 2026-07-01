@@ -1,15 +1,18 @@
+import os
+from datetime import datetime, timedelta
+
+from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+
+from app.database import SessionLocal
+from app.models import User
 from app.schemas import RegisterUser, LoginUser
 
-from app.models import User
-from app.database import SessionLocal
-
-
-from passlib.context import CryptContext
-from jose import jwt, JWTError
-from fastapi.security import OAuth2PasswordBearer
-from datetime import datetime, timedelta
+load_dotenv()
 
 router = APIRouter()
 
@@ -38,27 +41,31 @@ def verify_password(plain_password, hashed_password):
 
 
 # JWT
-SECRET_KEY = "supersecretkey"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
 
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
+
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 # REGISTER
 @router.post("/register")
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
-    print(user.password)
-    print(type(user.password))
-    print(len(user.password))
+    existing_user = db.query(User).filter(User.email == user.email).first()
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
 
     new_user = User(
-        name=user.name, email=user.email, password=hash_password(user.password)
+        name=user.name,
+        email=user.email,
+        password=hash_password(user.password),
     )
 
     db.add(new_user)
@@ -70,7 +77,6 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
 # LOGIN
 @router.post("/login")
 def login_user(user: LoginUser, db: Session = Depends(get_db)):
-
     db_user = db.query(User).filter(User.email == user.email).first()
 
     if not db_user:
@@ -86,7 +92,8 @@ def login_user(user: LoginUser, db: Session = Depends(get_db)):
 
 # CURRENT USER
 def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
 ):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
