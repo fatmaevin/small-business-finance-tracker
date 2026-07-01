@@ -12,6 +12,9 @@ function Dashboard() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [category, setCategory] = useState("");
+  const [paidFromTill, setPaidFromTill] = useState(false);
   const [transactionDate, setTransactionDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -44,37 +47,49 @@ function Dashboard() {
 
   const handleTransaction = async () => {
     const trimmedDescription = description.trim();
-  
-    if (!amount || !trimmedDescription || !type || !transactionDate) {
+
+    if (
+      !amount ||
+      !trimmedDescription ||
+      !type ||
+      !paymentMethod ||
+      !category ||
+      !transactionDate
+    ) {
       toast.error("Please fill in all fields.");
       return;
     }
-  
+
     if (Number(amount) <= 0) {
       toast.error("Amount must be greater than 0.");
       return;
     }
-  
+
     try {
       await API.post("/transactions", {
         amount: Number(amount),
         description: trimmedDescription,
         type,
+        payment_method: paymentMethod,
+        category,
         transaction_date: transactionDate,
+        paid_from_till: paidFromTill,
       });
-  
+
       toast.success("Transaction added successfully.");
-  
+
       setAmount("");
       setDescription("");
       setType("");
+      setPaymentMethod("");
+      setCategory("");
+      setPaidFromTill(false);
       setTransactionDate(new Date().toISOString().split("T")[0]);
-  
+
       fetchDashboard();
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-  
       toast.error("Transaction could not be added.");
     }
   };
@@ -92,7 +107,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-  
+
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -100,9 +115,9 @@ function Dashboard() {
           </h1>
           <p className="text-gray-500 mt-1">{user.email}</p>
         </div>
-  
+
         <SummaryCards summary={summary} />
-  
+
         <div className="mt-8">
           <TransactionForm
             amount={amount}
@@ -111,6 +126,12 @@ function Dashboard() {
             setDescription={setDescription}
             type={type}
             setType={setType}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            category={category}
+            setCategory={setCategory}
+            paidFromTill={paidFromTill}
+            setPaidFromTill={setPaidFromTill}
             transactionDate={transactionDate}
             setTransactionDate={setTransactionDate}
             handleTransaction={handleTransaction}

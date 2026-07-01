@@ -41,6 +41,10 @@ def get_accounting_report(
         t.amount
         for t in transactions
         if t.type == "income" and t.payment_method == "cash"
+    ) + sum(
+        t.amount
+        for t in transactions
+        if t.type == "expense" and t.payment_method == "cash" and t.paid_from_till
     )
 
     bank_income = sum(

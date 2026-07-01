@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from decimal import Decimal
 
 class RegisterUser(BaseModel):
     name:str
@@ -20,18 +21,20 @@ class UserResponse(BaseModel):
 
 
 class TransactionCreate(BaseModel):
-    amount: int
+    amount: Decimal
     description: str
     type: str
     transaction_date: datetime
     payment_method: str
     category: str | None = None
+    paid_from_till: bool = False
 
 
 class TransactionUpdate(BaseModel):
-    amount: int
+    amount: Decimal
     description: str
     type: str
     transaction_date: datetime
     payment_method: str
     category: str | None = None 
+    paid_from_till: bool = False

@@ -42,6 +42,7 @@ def create_transaction(
         user_id=current_user.id,
         payment_method=transaction.payment_method,
         category=transaction.category,
+        paid_from_till=transaction.paid_from_till,
     )
 
     db.add(new_txn)
@@ -58,6 +59,7 @@ def create_transaction(
             "transaction_date": new_txn.transaction_date,
             "payment_method": new_txn.payment_method,
             "category": new_txn.category,
+            "paid_from_till": new_txn.paid_from_till,
         },
     }
 
@@ -81,23 +83,33 @@ def get_transactions(
 def get_dashboard(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-
-    # Income transactions
     income_transactions = (
         db.query(Transaction)
         .filter(Transaction.user_id == current_user.id, Transaction.type == "income")
         .all()
     )
 
-    # Expense transactions
     expense_transactions = (
         db.query(Transaction)
         .filter(Transaction.user_id == current_user.id, Transaction.type == "expense")
         .all()
     )
 
-    # Sum calculations
-    total_income = sum(t.amount for t in income_transactions)
+    paid_from_till_expenses = (
+        db.query(Transaction)
+        .filter(
+            Transaction.user_id == current_user.id,
+            Transaction.type == "expense",
+            Transaction.payment_method == "cash",
+            Transaction.paid_from_till == True,
+        )
+        .all()
+    )
+
+    total_income = sum(t.amount for t in income_transactions) + sum(
+        t.amount for t in paid_from_till_expenses
+    )
+
     total_expense = sum(t.amount for t in expense_transactions)
 
     balance = total_income - total_expense
@@ -113,6 +125,8 @@ def get_dashboard(
         "balance": balance,
         "transaction_count": len(income_transactions) + len(expense_transactions),
     }
+
+
 # -----------------------
 # DELETE TRANSACTIONS
 # -----------------------
@@ -167,6 +181,7 @@ def update_transaction(
     transaction.transaction_date = updated_transaction.transaction_date
     transaction.payment_method = updated_transaction.payment_method
     transaction.category = updated_transaction.category
+    transaction.paid_from_till = updated_transaction.paid_from_till
 
     db.commit()
     db.refresh(transaction)
@@ -175,5 +190,3 @@ def update_transaction(
         "message": "Transaction updated successfully",
         "transaction": transaction,
     }
-
-
