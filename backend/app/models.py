@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey,Numeric,Boolean
 from app.database import Base
 from datetime import datetime
 
@@ -14,7 +14,7 @@ class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True)
-    amount = Column(Integer)
+    amount = Column(Numeric(10,2), nullable=False)
     description = Column(String)
     type = Column(String, nullable=False)
     transaction_date = Column(DateTime, nullable=False)
@@ -22,3 +22,4 @@ class Transaction(Base):
     category = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    paid_from_till=Column(Boolean ,default=False)
