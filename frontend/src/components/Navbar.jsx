@@ -27,6 +27,12 @@ function Navbar() {
           >
             Transactions
           </Link>
+          <Link
+            to="/reports"
+            className="text-gray-600 hover:text-blue-600 transition"
+          >
+            Reports
+          </Link>
 
           <button
             onClick={handleLogout}
