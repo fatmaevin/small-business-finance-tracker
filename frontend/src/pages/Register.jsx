@@ -11,9 +11,19 @@ function Register() {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    if (name.trim().length < 2) {
+      toast.error("Name must be at least 2 characters.");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+
     try {
       await API.post("/register", {
-        name,
+        name: name.trim(),
         email,
         password,
       });
@@ -27,7 +37,15 @@ function Register() {
       console.log(err.response?.data);
       console.log(err.message);
 
-      toast.error(err.response?.data?.detail || "Registration failed.");
+      const detail = err.response?.data?.detail;
+
+      if (Array.isArray(detail)) {
+        toast.error(detail[0]?.msg || "Registration failed.");
+      } else if (typeof detail === "string") {
+        toast.error(detail);
+      } else {
+        toast.error("Registration failed.");
+      }
     }
   };
 
@@ -35,7 +53,7 @@ function Register() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">DailyBooks</h1>
+          <h1 className="text-3xl font-bold text-gray-900">WeeklyBook</h1>
 
           <p className="text-gray-500 mt-2">
             Create your account to start tracking your business finances.
@@ -78,7 +96,7 @@ function Register() {
 
             <input
               type="password"
-              placeholder="Create a password"
+              placeholder="At least 8 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"

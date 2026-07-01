@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import toast from "react-hot-toast";
 
@@ -7,10 +7,22 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
   const handleLogin = async () => {
+    if (!email.trim()) {
+      toast.error("Please enter your email.");
+      return;
+    }
+
+    if (!password) {
+      toast.error("Please enter your password.");
+      return;
+    }
+
     try {
       const res = await API.post("/login", {
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -21,30 +33,31 @@ function Login() {
 
       localStorage.setItem("token", res.data.access_token);
 
-      window.location.href = "/dashboard";
+      navigate("/dashboard");
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      toast.error("Login failed.");
+
+      const detail = err.response?.data?.detail;
+
+      if (typeof detail === "string") {
+        toast.error(detail);
+      } else {
+        toast.error("Login failed.");
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Business Finance Tracker
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900">WeeklyBook</h1>
 
-          <p className="text-gray-500 mt-2">
-            Welcome back! Please sign in.
-          </p>
+          <p className="text-gray-500 mt-2">Welcome back! Please sign in.</p>
         </div>
 
         <div className="space-y-5">
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email
