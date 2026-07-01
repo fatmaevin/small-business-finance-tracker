@@ -9,12 +9,16 @@ class User(Base):
     email=Column(String (100), unique=True,index=True)
     password=Column(String(255))
 
+
 class Transaction(Base):
-    __tablename__="transactions"
+    __tablename__ = "transactions"
+
     id = Column(Integer, primary_key=True)
-    amount=Column(Integer)
-    description=Column(String)
-    type=Column(String ,nullable =False)
-    created_at=Column(DateTime, default=datetime.utcnow)
+    amount = Column(Integer)
+    description = Column(String)
+    type = Column(String, nullable=False)
+    transaction_date = Column(DateTime, nullable=False)
+    payment_method = Column(String, nullable=False)
+    category = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    transaction_date=Column(DateTime, nullable=False)
