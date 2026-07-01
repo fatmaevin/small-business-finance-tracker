@@ -4,6 +4,7 @@ from app.database import Base, engine
 from app.routes import auth
 from app.routes import transactions
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes import reports
 
 app = FastAPI()
 app.add_middleware(
@@ -17,6 +18,7 @@ app.add_middleware(
 # routes bağlama
 app.include_router(auth.router)
 app.include_router(transactions.router)
+app.include_router(reports.router)
 
 # tablo oluştur (ilk run için)
 Base.metadata.create_all(bind=engine)
