@@ -24,6 +24,8 @@ class TransactionCreate(BaseModel):
     description: str
     type: str
     transaction_date: datetime
+    payment_method: str
+    category: str | None = None
 
 
 class TransactionUpdate(BaseModel):
@@ -31,3 +33,5 @@ class TransactionUpdate(BaseModel):
     description: str
     type: str
     transaction_date: datetime
+    payment_method: str
+    category: str | None = None 
