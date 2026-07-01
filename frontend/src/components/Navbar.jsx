@@ -10,7 +10,7 @@ function Navbar() {
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link to="/dashboard" className="text-xl font-bold text-gray-900">
-          💼 Business Finance Tracker
+         WeeklyBook
         </Link>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
