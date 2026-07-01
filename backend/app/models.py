@@ -8,6 +8,8 @@ class User(Base):
     name=Column(String (100))
     email=Column(String (100), unique=True,index=True)
     password=Column(String(255))
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String(255), nullable=True)
 
 
 class Transaction(Base):

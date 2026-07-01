@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import toast from "react-hot-toast";
 
@@ -7,6 +7,8 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     try {
@@ -16,12 +18,16 @@ function Register() {
         password,
       });
 
-      toast.success("Registration successful.");
-      window.location.href = "/login";
+      toast.success("Registration successful. Please check your email.");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       console.log(err.response?.data);
       console.log(err.message);
-      toast.error("Registration failed.");
+
+      toast.error(err.response?.data?.detail || "Registration failed.");
     }
   };
 
@@ -29,9 +35,7 @@ function Register() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Business Finance Tracker
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900">DailyBooks</h1>
 
           <p className="text-gray-500 mt-2">
             Create your account to start tracking your business finances.
